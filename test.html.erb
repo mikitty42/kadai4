@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <% require 'pg' %>
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+
+    <% result = connection.exec("select * from crops where quality = false;") %>
+    <% data = [] %>
+    <% result.each do |record| %>
+    <%  data << "ゴーヤの品質: #{record["weight"]}" %>
+    <% end %>
+    <form action="goya.cgi" method="POST">
+       下記のボタンを押すと、ゴーヤの品質の情報ページに飛びます<br><br>
+      <input type="text" name="goya" value="<%= data.join(' ') %>">
+      <input type="submit" name="送信">
+      </form>
+      <% result1 = connection.exec("select * from crops where  give_for != '自家消費';") %>
+      <% data1 = [] %>
+      <% result1.each do |record| %>
+      <%  data1 << "譲渡先:#{record["give_for"]}" %>
+      <% end %>
+      <form action="miki.cgi" method="POST">
+         下記のボタンを押すと、ゴーヤの譲渡先の情報ページに飛びます<br><br>
+        <input type="text" name="miki" value="<%= data1.join(' ') %>">
+        <input type="submit" name="送信">
+
+    </form>
+  </body>
+</html>
